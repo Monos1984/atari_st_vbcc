@@ -1,7 +1,7 @@
 @echo off
 rem =================================================
 rem * Fichier bat de compilation VBCC pour Atari st *
-rem * 16/05/2021                                    *
+rem * 17/05/2021                                    *
 rem * Jean Monos                                    *
 rem =================================================
 
@@ -55,7 +55,7 @@ echo ----------------------------
 echo ===================
 echo - Editeur de lien -
 echo ===================
-%CL% -EB -bataritos -x -Bstatic -Cvbcc -nostdlib "I:\0000-atari\targets\m68k-atari\lib\startup16.o" source/*.o -L"I:\0000-atari\targets\m68k-atari\lib" -lvc16 I:\0000-atari\targets\m68k-atari\lib\libgem.a -o %OUT%\%NAME%
+%CL% -EB -bataritos -x -Bstatic -Cvbcc -nostdlib "I:\0000-atari\targets\m68k-atari\lib\startup16.o" source/*.o -L"I:\0000-atari\targets\m68k-atari\lib" -lvc16 I:\0000-atari\targets\m68k-atari\lib\libgem16.a -o %OUT%\%NAME%
 
 echo -------------------------------------------------------
 if exist %OUT%\%NAME% ( echo %NAME% is create in folder %OUT%  ) else (%NAME% not compiled)
