@@ -1,64 +1,105 @@
 @echo off
-rem =================================================
+rem *************************************************
 rem * Fichier bat de compilation VBCC pour Atari st *
-rem * 17/05/2021                                    *
+rem * et le librairie STGFXEngine                   *
+rem * 22/05/2021                                    *
 rem * Jean Monos                                    *
-rem =================================================
+rem *************************************************
 
-rem ===========================
-rem * Configuration des liens *
-rem ===========================
+rem ===================================
+rem * Lien de configuration du projet *
+rem ===================================
 
-rem ------------------
-rem * Lien du projet *
-rem ------------------
+rem * -------------------------------
+rem * Lien du code source du projet *
+rem ---------------------------------
 set SOURCE=source
+
+rem ----------------------------------------------------------
+rem * Lien du dossier ou se trouve les outils de compilation *
+rem ----------------------------------------------------------
+set COMPILE_BIN=..\..\bin\
+
+rem ---------------------------------
+rem * lien des includes de la cible *
+rem ---------------------------------
 set F_INCLUDE=I:\0000-atari\targets\m68k-atari\include
+
+rem -------------------------------------
+rem * lien de sortie du fichier binaire *
+rem -------------------------------------
 set OUT=bin
-set NAME=hello.tos
+
+rem --------------------------
+rem * nom du fichier binaire *
+rem --------------------------
+set NAME=crpg.prg
+
+rem -------------------------------------------
+rem * lien du fichier o de la librairie STGFX *
+rem -------------------------------------------
+set GFX_LIB=../../STGFXEngine/bin/STGFXLIB.o
+
+rem -----------------------------
+rem * lien du dossier GFXENGINE *
+rem -----------------------------
+set GFX_INCLUDE=../../STGFXEngine
+
+rem --------------------------------------
+rem * lien du dossier include personelle *
+rem --------------------------------------
+set HEADER_INCLUDE="source/header/"
 
 rem -----------------------
 rem * Lien du compilateur *
 rem -----------------------
-set CC=vbccm68ks
-set CA=vasmm68k_mot
-set CL=vlink
+set CC=%COMPILE_BIN%vbccm68ks
+set CA=%COMPILE_BIN%vasmm68k_mot
+set CL=%COMPILE_BIN%vlink
 
 
-echo =================
-echo - Menage        -
-echo =================
+rem ========================================
+rem * Deroulement du script de compilation * 
+rem ========================================
+
+echo ============================
+echo - Menage de securite       -
+echo ============================
 if exist %OUT%\%NAME% del %OUT%\%NAME%
+if exist %SOURCE%\*.asm del %SOURCE%\*.asm
+if exist %SOURCE%\*.o del %SOURCE%\*.o
 
-echo =================
-echo - Compilation C -
-echo =================
+echo ===========================================
+echo - Preprocesseur et Compilation (C en ASM) -
+echo ===========================================
+
 for %%i in (%SOURCE%\*.c) do ( 
 echo ----------------------------
 echo %%~nxi
 echo ----------------------------
-%CC% -c99  %SOURCE%/%%~nxi -I%F_INCLUDE% 
+%CC% -c99 -quiet %SOURCE%/%%~nxi -O=1 -I%F_INCLUDE% -I%GFX_INCLUDE% -I%HEADER_INCLUDE%
 )
 
-echo ===================
-echo - Compilation ASM -
-echo ===================
+echo =========================
+echo - Assemblage (ASM en o) -
+echo =========================
 
 for %%i in (%SOURCE%\*.asm) do ( 
 echo ----------------------------
 echo %%~nxi
 echo ----------------------------
-%CA% -Faout -mid=0 -phxass -nowarn=62  source/%%~nxi -o source/%%~ni.o
+%CA% -quiet -Faout -mid=0 -phxass -nowarn=62  source/%%~nxi -o source/%%~ni.o
 
 )
 
 echo ===================
 echo - Editeur de lien -
 echo ===================
-%CL% -EB -bataritos -x -Bstatic -Cvbcc -nostdlib "I:\0000-atari\targets\m68k-atari\lib\startup16.o" source/*.o -L"I:\0000-atari\targets\m68k-atari\lib" -lvc16 I:\0000-atari\targets\m68k-atari\lib\libgem16.a -o %OUT%\%NAME%
+
+%CL% -EB -bataritos -x -Bstatic -Cvbcc -nostdlib "I:\0000-atari\targets\m68k-atari\lib\startup16.o"  source/*.o  %GFX_LIB% -s -L"I:\0000-atari\targets\m68k-atari\lib" -lvc16 -o %OUT%\%NAME%
 
 echo -------------------------------------------------------
-if exist %OUT%\%NAME% ( echo %NAME% is create in folder %OUT%  ) else (%NAME% not compiled)
+if exist %OUT%\%NAME% ( echo %NAME% is create in folder %OUT% ) else (%NAME% not compiled)
 echo -------------------------------------------------------
 
 pause
