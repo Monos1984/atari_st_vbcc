@@ -71,11 +71,6 @@ int main()
   //              (X,Y,Index Couleur...)
   STX_printstring (0,0,1,REPLACE,HOR,"Hello World"); 
   
-  // + -------- +
-  // * wait vbl *
-  // + -------- +
-  STX_waitvbl();
-  
   // + ----------------------------------- +
   // * Inverser Ecran Logique <=> Physique *
   // + ----------------------------------- +
